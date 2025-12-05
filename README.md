@@ -56,3 +56,16 @@ Este documento **incluirá** la explicación del problema, la solución propuest
 
 ---
 
+
+**Distribución de Aplicaciones**
+| Integrante | App | Descripción / Responsabilidades | Modelos | Endpoints especiales |
+|------------|-----|--------------------------------|---------|----------------------|
+| **Angelica** (Integrante 1) | **users** | Registro e inicio de sesión con JWT, Roles (admin, empresa, aprendiz), Perfil, Permisos personalizados | User (extends AbstractUser), Profile | `/users/me/`<br>`/users/{id}/skills/` |
+| | **organizations** | Gestión de empresas, equipos de trabajo y administradores internos | Organization, Team (ManyToMany con Users) | `/organizations/{id}/members/`<br>`/organizations/{id}/teams/` |
+| **Sara** (Integrante 2) | **skills** | Categorías, habilidades y niveles dinámicos | Category, Skill, SkillLevel (User + Skill con nivel dinámico) | `/skills/{id}/top-users/`<br>`/skills/{id}/levels/` |
+| | **evidence** | Gestión de evidencias del usuario: fotos, snippets, archivos y links | Evidence, MediaFile | `/evidence/user/{id}/`<br>`/evidence/skill/{id}/` |
+| **Mariana** (Integrante 3) | **assessments** | Pruebas inteligentes, retos, preguntas, opciones | Assessment, Question, Option | `/assessments/{id}/start/`<br>`/assessments/{id}/submit/` (atomic) |
+| | **results** | Procesa puntajes, tiempo, dificultad y recomendaciones | Result, UserScore | `/results/user/{id}/history/`<br>`/results/user/{id}/improvements/` |
+| **Jeonardo** (Integrante 4) | **certifications** | Certificaciones basadas en evidencias, resultados y nivel del usuario | Certification | `/certifications/{user_id}/generate/`<br>`/certifications/{user_id}/history/` |
+
+Una vez finalizada la implementación de estas apps, se realizara el despliegue por parte de todos los miembros, pues es importante que todos tengan la capacidad de explicar como funciona y como se hizo.
