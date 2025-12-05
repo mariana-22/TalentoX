@@ -1,5 +1,4 @@
 # TalentoX
-Perfecto, incluiré el nombre del proyecto **TalentoX** dentro de la bitácora, manteniendo el estilo a futuro:
 
 ---
 
