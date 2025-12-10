@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "skills",
     'rest_framework',
     'drf_spectacular',
+    'evidence',
 ]
 
 MIDDLEWARE = [
