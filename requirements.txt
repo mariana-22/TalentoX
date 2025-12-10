@@ -1,0 +1,5 @@
+Django==6.0
+djangorestframework
+drf-yasg
+django-filter
+mysql-connector-python
