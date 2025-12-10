@@ -7,7 +7,7 @@ User = get_user_model()
 class Result(models.Model):
     """Resultado de una evaluación completada por un usuario"""
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='results')
-    assessment = models.ForeignKey('Assessments.Assessment', on_delete=models.CASCADE, related_name='results')
+    assessment = models.ForeignKey('assessments.assessment', on_delete=models.CASCADE, related_name='results')
     
     score = models.FloatField(
         default=0,
