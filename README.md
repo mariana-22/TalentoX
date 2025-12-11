@@ -1,71 +1,147 @@
-# TalentoX
+# Plataforma TalentoX
 
----
+## 🧠 Descripción de – **TalentoX**
+TalentoX es una plataforma inteligente que evalúa habilidades reales mediante pruebas, retos prácticos y evidencias.
+El objetivo es medir competencias reales, no títulos, generando un “pasaporte digital de habilidades”.
 
-### 📘 **Bitácora del Proyecto TalentoX (Proyección a Futuro)**
+## ⭐ Descripción General del Proyecto
+Talentox permite:
 
-**Día 1 – Definición del concepto**
-Durante este día se **identificará** la necesidad de que TalentoX evalúe habilidades reales por encima de títulos académicos.
-Se **definirá** el enfoque principal de la plataforma, basado en micro-pruebas, retos prácticos y evidencias verificables.
-Además, se **creará** el concepto central del sistema: el **Pasaporte de Habilidades de TalentoX**, que será el eje de certificación.
+- Evaluar habilidades mediante ***micro-pruebas***.
+- Medir niveles y puntajes dinámicos.
+- Recomendar nuevas habilidades y pruebas.
+- Generar certificaciones inteligentes.
+- Consultar información desde Swagger o vía API.
 
----
+El sistema está dividido en módulos (apps) para cada parte del proceso: `usuarios`, `empresas`, `habilidades`, `evaluaciones`, `resultados`, `certificaciones` y `recomendaciones`.
 
-**Día 2 – Análisis del problema y la solución**
-Se **documentarán** los problemas del modelo tradicional de certificación frente al objetivo de TalentoX.
-Se **establecerán** los tipos de evaluaciones que la plataforma ofrecerá:
+## 🏗️ Arquitectura
+```bash
+skillbridge/
+├── config/
+│   └── settings/
+│       ├── base.py
+│       ├── dev.py
+│       └── prod.py
+│
+├── apps/
+│   ├── users/
+│   ├── organizations/
+│   ├── skills/
+│   ├── evidence/
+│   ├── assessments/
+│   ├── results/
+│   ├── certifications/
+│   └── recommendations/
+│
+└── manage.py
+```
+- settings/base.py → Configuración general (apps, DRF, JWT, middleware).
+- settings/dev.py → Configuración para desarrollo (debug, sqlite/mysql local).
+- settings/prod.py → Seguridad, CORS, logs, base de datos real.
 
-* Micro-pruebas inteligentes
-* Retos prácticos
-* Evidencias verificables
+## 🔐 Autenticación JWT
 
-También se **definirán** los indicadores de evaluación que utilizará TalentoX: dificultad, tiempo, exactitud, evidencias y consistencia.
+Incluye:
+- `Registro`
+- `Login`
+- `Token Access / Refresh`
+- `Vista /users/me/ para perfil propio`
+- `Permisos personalizados por rol`
+Roles principales:
+- `admin`
+- `empresa`
+- `aprendiz`
 
----
+## 🔒 Permisos Personalizados
+- Solo empresas pueden ver sus equipos.
+- Solo el propio usuario puede editar su perfil.
+- Administradores tienen acceso global.
 
-**Día 3 – Diseño del sistema de puntajes**
-Se **creará** la estructura de asignación de puntajes de TalentoX, basada en: dificultad del reto, tiempo de respuesta, correctitud, evidencias y consistencia.
-Además, se **establecerá** la escala oficial de niveles de habilidad del proyecto, que irá de 0 a 5.
+## 🔍 Filtros
+El backend incluye filtros para:
+- ***Usuarios***
+- ***Equipos***
+- ***Habilidades***
+- ***Niveles***
+- ***Evidencias***
+- ***Resultados***
 
----
+Uso estándar con django-filter:
+```bash
+/skills/?category=1
+/assessments/?difficulty=high
+```
 
-**Día 4 – Modelado funcional**
-Se **desarrollarán** ejemplos concretos de retos y pruebas usados por TalentoX.
-Se **describirán** los parámetros que se evaluarán en cada tipo de prueba.
-Finalmente, se **definirá** el flujo adaptativo de evaluación que permitirá ajustar las pruebas según el desempeño del usuario.
-
----
-
-**Día 5 – Documentación del perfil del usuario**
-Se **construirá** la estructura del **Perfil de Habilidades TalentoX**, que incluirá:
-
-* Habilidad
-* Nivel
-* Última evaluación
-* Puntaje total
-* Evidencias
-
-También se **documentará** el funcionamiento del **Pasaporte de Habilidades TalentoX** y su actualización progresiva.
-
----
-
-**Día 6 – Integración y limpieza del README**
-Se **organizará** toda la información del proyecto TalentoX.
-Se **redactará** el README final con un formato claro, ordenado y adecuado para publicación.
-Este documento **incluirá** la explicación del problema, la solución propuesta, el modelo de evaluación, ejemplos y datos simulados generados por la plataforma.
-
----
+## ❤️ Health Check
 
 
-**Distribución de Aplicaciones**
-| Integrante | App | Descripción / Responsabilidades | Modelos | Endpoints especiales |
-|------------|-----|--------------------------------|---------|----------------------|
-| **Angelica** (Integrante 1) | **users** | Registro e inicio de sesión con JWT, Roles (admin, empresa, aprendiz), Perfil, Permisos personalizados | User (extends AbstractUser), Profile | `/users/me/`<br>`/users/{id}/skills/` |
-| | **organizations** | Gestión de empresas, equipos de trabajo y administradores internos | Organization, Team (ManyToMany con Users) | `/organizations/{id}/members/`<br>`/organizations/{id}/teams/` |
-| **Sara** (Integrante 2) | **skills** | Categorías, habilidades y niveles dinámicos | Category, Skill, SkillLevel (User + Skill con nivel dinámico) | `/skills/{id}/top-users/`<br>`/skills/{id}/levels/` |
-| | **evidence** | Gestión de evidencias del usuario: fotos, snippets, archivos y links | Evidence, MediaFile | `/evidence/user/{id}/`<br>`/evidence/skill/{id}/` |
-| **Mariana** (Integrante 3) | **assessments** | Pruebas inteligentes, retos, preguntas, opciones | Assessment, Question, Option | `/assessments/{id}/start/`<br>`/assessments/{id}/submit/` (atomic) |
-| | **results** | Procesa puntajes, tiempo, dificultad y recomendaciones | Result, UserScore | `/results/user/{id}/history/`<br>`/results/user/{id}/improvements/` |
-| **Jeonardo** (Integrante 4) | **certifications** | Certificaciones basadas en evidencias, resultados y nivel del usuario | Certification | `/certifications/{user_id}/generate/`<br>`/certifications/{user_id}/history/` |
+## 🔄 Transacciones
+- Operaciones críticas usan transacciones atómicas:
+- Enviar prueba `/assessments/{id}/submit/`
+- Generar certificación
+- Procesar resultados
+- Garantiza que los datos no queden incompletos.
 
-Una vez finalizada la implementación de estas apps, se realizara el despliegue por parte de todos los miembros, pues es importante que todos tengan la capacidad de explicar como funciona y como se hizo.
+## 🧪 Pruebas
+El proyecto incluye pruebas para:
+- Autenticación
+- Endpoints principales
+- Lógica de resultados
+- Permisos
+- Habilidades
+- Evidencias
+
+Se ejecutan con:
+```bash
+python manage.py test
+```
+
+## 📘 Swagger + API Deploy
+Incluye documentación automática:
+```bash
+/swagger/
+/api/schema/
+/redoc/
+```
+Desde Swagger se pueden probar:
+- login
+- registro
+- CRUDs
+- pruebas
+- resultados
+- evidencias
+
+## 🧩 Módulos del Proyecto
+
+### 👤 ***Integrante 1*** – App **users** (Usuarios y Roles)
+- **Funcionalidades**
+- Registro e inicio de sesión con JWT.
+- Perfiles de usuario.
+- Roles (admin, empresa, aprendiz).
+- Permisos personalizados.
+
+- **Modelos**
+- User (extends AbstractUser)
+- Profile
+
+- **Endpoints principales**
+`/users/me/`
+`/users/{id}/skills/`
+
+### 🏢 ***Integrante 1*** – App **organizations** (Empresas y Equipos)
+- **Funcionalidad**
+
+Gestión de:
+- Empresas
+- Equipos de trabajo
+- Miembros
+- Administradores internos
+
+- **Modelos**
+- Organization
+- Team (ManyToMany con Users)
+
+- **Endpoints principales**
+`/organizations/{id}/members/`
+`/organizations/
