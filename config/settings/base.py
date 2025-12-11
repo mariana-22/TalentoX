@@ -37,6 +37,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "skills",
+    'drf_spectacular',
+    'evidence',
     'rest_framework',
     'drf_yasg',
     'django_filters',
@@ -126,8 +129,13 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'TalentoX API',
+    'DESCRIPTION': 'API documentation for TalentoX',
+    'VERSION': '1.0.0',
 # Django REST Framework
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
