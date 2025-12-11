@@ -13,3 +13,4 @@ drf-yasg
 django-filter
 mysql-connector-python
 mysqlclient
+gunicorn  
