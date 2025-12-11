@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'apps.assessments.apps.AssessmentsConfig',
     'apps.results.apps.ResultsConfig',
     'apps.certifications.apps.CertificationsConfig',
+    'apps.recomendaciones.apps.RecomendacionesConfig',
 ]
 
 MIDDLEWARE = [
@@ -133,6 +134,8 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'TalentoX API',
     'DESCRIPTION': 'API documentation for TalentoX',
     'VERSION': '1.0.0',
+}
+
 # Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
