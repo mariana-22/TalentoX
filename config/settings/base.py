@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'drf_yasg',
     'django_filters',
     'apps.assessments.apps.AssessmentsConfig',
-    'apps.results.apps.ResultsConfig'
+    'apps.results.apps.ResultsConfig',
+    'apps.certifications.apps.CertificationsConfig',
 ]
 
 MIDDLEWARE = [
