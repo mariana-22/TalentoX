@@ -1,2 +1,7 @@
 djangorestframework
 drf-spectacular
+Django==6.0
+drf-yasg
+django-filter
+mysql-connector-python
+mysqlclient
