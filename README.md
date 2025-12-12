@@ -1,3 +1,5 @@
+[Link del despliegue](https://talentox.onrender.com/schema/swagger-ui/)
+
 # Plataforma TalentoX
 
 ## 🧠 Descripción de – **TalentoX**
