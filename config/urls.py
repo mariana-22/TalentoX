@@ -15,35 +15,29 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path,include
+from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
-from rest_framework import permissions
 
 urlpatterns = [
+    # Admin
     path('admin/', admin.site.urls),
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('api/', include('skills.urls')),
-    path('api/', include('evidence.urls')),
-    path('admin/', admin.site.urls),
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('api/redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+    
+    # API Documentation
+    path('schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # Authentication (public endpoints)
+    path('auth/', include('apps.users.auth_urls')),
+    
+    # App endpoints (require authentication)
     path('assessments/', include('apps.assessments.urls')),
-    path('results/', include('apps.results.urls')),
     path('certifications/', include('apps.certifications.urls')),
-
-
-schema_view = get_schema_view(
-    openapi.Info(
-        title="TalentoX API",
-        default_version='v1',
-        description="API para aplicación de evaluaciones TalentoX",
-    ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
-)
+    path('evidence/', include('apps.evidence.urls')),
+    path('organizations/', include('apps.organizations.urls')),
+    path('results/', include('apps.results.urls')),
+    path('skills/', include('apps.skills.urls')),
+    path('users/', include('apps.users.urls')),
 
 ]
+

@@ -1,6 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db.models import Avg, Max, Min, Sum
@@ -14,16 +15,29 @@ from .serializers import (
     UserStatsSerializer
 )
 from .filters import ResultFilter
+from apps.users.permissions import IsAdminOrEmpresaOrReadOnly, CanManageResults
 
 # ==================== CRUD DE RESULTS ====================
 
 class ResultListCreateView(generics.ListCreateAPIView):
-    queryset = Result.objects.all()
+    """
+    List all results or create a new one.
+    - Admin/Empresa: Full access to all results
+    - Aprendiz: Can only view their own results
+    """
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = ResultFilter
     search_fields = ['user__username', 'assessment__title']
     ordering_fields = ['id', 'score', 'correct_answers', 'time_taken', 'created_at']
     ordering = ['-created_at']
+    permission_classes = [CanManageResults]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['admin', 'empresa']:
+            return Result.objects.all()
+        # Aprendiz can only see their own results
+        return Result.objects.filter(user=user)
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -70,7 +84,13 @@ class ResultListCreateView(generics.ListCreateAPIView):
 
 
 class ResultDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a result.
+    - Admin/Empresa: Full access
+    - Aprendiz: Read only (their own results)
+    """
     queryset = Result.objects.all()
+    permission_classes = [CanManageResults]
     lookup_field = 'pk'
     
     def get_serializer_class(self):

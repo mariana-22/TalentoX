@@ -9,34 +9,29 @@ from django.db import transaction
 from .models import Category, Skill, SkillLevel
 from .serializers import CategorySerializer, SkillSerializer, SkillLevelSerializer
 from django.contrib.auth import get_user_model
+from apps.users.permissions import IsAdminOrReadOnly, IsAdminOrEmpresaOrReadOnly
 
 User = get_user_model()
 
-class IsStaffOrReadOnly(permissions.BasePermission):
-    def has_permission(self, request, view):
-        # lectura para cualquiera autenticado (o público si quieres)
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        # escritura solo para staff (ajusta si quieres que sea propietario)
-        return request.user and request.user.is_authenticated and request.user.is_staff
-
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        return request.user and request.user.is_staff
 
 class CategoryViewSet(viewsets.ModelViewSet):
+    """
+    Categories - Admin can CRUD, others can only read.
+    """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [IsStaffOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ["name"]
     ordering_fields = ["name"]
 
 class SkillViewSet(viewsets.ModelViewSet):
+    """
+    Skills - Admin can CRUD, others can only read.
+    """
     queryset = Skill.objects.select_related("category").all()
     serializer_class = SkillSerializer
-    permission_classes = [IsStaffOrReadOnly]
+    permission_classes = [IsAdminOrReadOnly]
     filter_backends = (DjangoFilterBackend, SearchFilter, OrderingFilter)
     filterset_fields = {
         "category__id": ["exact"],
@@ -65,8 +60,11 @@ class SkillViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class SkillLevelViewSet(viewsets.ModelViewSet):
+    """
+    Skill Levels - Admin and Empresa can CRUD, Aprendiz can only read.
+    """
     queryset = SkillLevel.objects.select_related("user","skill").all()
     serializer_class = SkillLevelSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminOrEmpresaOrReadOnly]
     filter_backends = (DjangoFilterBackend, SearchFilter)
     filterset_fields = {"user__id":["exact"], "skill__id":["exact"], "level":["gte","lte"]}

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth import get_user_model
-from skills.models import Skill
+from apps.skills.models import Skill
 
 User = get_user_model()
 

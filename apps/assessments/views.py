@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework import status, generics
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django_filters.rest_framework import DjangoFilterBackend
@@ -15,11 +16,18 @@ from .serializers import (
     QuestionSerializer
 )
 from .filters import AssessmentFilter, QuestionFilter
+from apps.users.permissions import IsAdminOrEmpresaOrReadOnly, CanManageAssessments
 
 # ==================== CRUD DE ASSESSMENTS ====================
 
 class AssessmentListCreateView(generics.ListCreateAPIView):
+    """
+    List all assessments or create a new one.
+    - Admin/Empresa: Full access
+    - Aprendiz: Read only
+    """
     queryset = Assessment.objects.all()
+    permission_classes = [IsAdminOrEmpresaOrReadOnly]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = AssessmentFilter
     search_fields = ['title', 'description']
@@ -71,7 +79,13 @@ class AssessmentListCreateView(generics.ListCreateAPIView):
 
 
 class AssessmentDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete an assessment.
+    - Admin/Empresa: Full access
+    - Aprendiz: Read only
+    """
     queryset = Assessment.objects.all()
+    permission_classes = [IsAdminOrEmpresaOrReadOnly]
     lookup_field = 'pk'
     
     def get_serializer_class(self):
@@ -124,7 +138,12 @@ class AssessmentDetailView(generics.RetrieveUpdateDestroyAPIView):
 # ==================== CRUD DE QUESTIONS ====================
 
 class QuestionListView(generics.ListAPIView):
+    """
+    List all questions for an assessment.
+    All authenticated users can view.
+    """
     serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = QuestionFilter
     search_fields = ['text']
@@ -167,6 +186,13 @@ class QuestionListView(generics.ListAPIView):
 
 
 class QuestionCreateView(APIView):
+    """
+    Create a question with options for an assessment.
+    - Admin/Empresa: Full access
+    - Aprendiz: No access
+    """
+    permission_classes = [IsAdminOrEmpresaOrReadOnly]
+    
     @swagger_auto_schema(
         operation_description="Agregar una pregunta con opciones a una evaluación",
         request_body=QuestionCreateSerializer,
@@ -210,7 +236,13 @@ class QuestionCreateView(APIView):
 
 
 class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update or delete a question.
+    - Admin/Empresa: Full access
+    - Aprendiz: Read only
+    """
     queryset = Question.objects.all()
+    permission_classes = [IsAdminOrEmpresaOrReadOnly]
     lookup_field = 'question_id'
     
     def get_serializer_class(self):
@@ -319,8 +351,13 @@ class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
 # ==================== ENDPOINTS ESPECIALES ====================
 
 class StartAssessmentView(generics.RetrieveAPIView):
+    """
+    Start an assessment - get all questions and options.
+    All authenticated users can start assessments.
+    """
     queryset = Assessment.objects.all()
     serializer_class = AssessmentSerializer
+    permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
     
     @swagger_auto_schema(
@@ -332,6 +369,12 @@ class StartAssessmentView(generics.RetrieveAPIView):
 
 
 class SubmitAssessmentView(APIView):
+    """
+    Submit an answer to an assessment question.
+    All authenticated users can submit answers.
+    """
+    permission_classes = [IsAuthenticated]
+    
     @swagger_auto_schema(
         operation_description="Enviar una respuesta a una pregunta de la evaluación",
         request_body=SubmitAnswersSerializer,

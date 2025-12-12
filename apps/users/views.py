@@ -12,7 +12,7 @@ from .serializers import (
 )
 from .models import User, Profile
 from .filters import UserFilter
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsAdminOrEmpresa
 
 
 @extend_schema(
@@ -127,6 +127,12 @@ class ProfileView(APIView):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """
+    User management viewset.
+    - Admin: Full access to all users
+    - Empresa: Can list and view users
+    - Aprendiz: Can only view themselves (via /users/me/)
+    """
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -144,8 +150,18 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def get_permissions(self):
         if self.action in ['list', 'retrieve']:
-            return [IsAuthenticated()]
+            return [IsAdminOrEmpresa()]
         return [IsAdmin()]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin':
+            return User.objects.all()
+        elif user.role == 'empresa':
+            # Empresa can see all users
+            return User.objects.all()
+        # Aprendiz shouldn't access this viewset (use /users/me/ instead)
+        return User.objects.filter(id=user.id)
 
     @extend_schema(
         operation_id='users_list',
