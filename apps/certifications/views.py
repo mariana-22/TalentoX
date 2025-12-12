@@ -1,6 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django.db.models import Avg, Sum, Count
@@ -16,6 +17,7 @@ from .serializers import (
     CertificationHistorySerializer
 )
 from .filters import CertificationFilter
+from apps.users.permissions import IsAdminOrEmpresaOrReadOnly, CanManageResults
 
 User = get_user_model()
 
@@ -23,13 +25,23 @@ User = get_user_model()
 # ==================== CRUD DE CERTIFICATIONS ====================
 
 class CertificationListCreateView(generics.ListCreateAPIView):
-    """Listar y crear certificaciones"""
-    queryset = Certification.objects.all()
+    """
+    Listar y crear certificaciones.
+    - Admin/Empresa: Full access to all certifications
+    - Aprendiz: Can only view their own certifications
+    """
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CertificationFilter
     search_fields = ['user__username', 'title', 'description']
     ordering_fields = ['id', 'level', 'total_score', 'issued_at', 'expires_at']
     ordering = ['-issued_at']
+    permission_classes = [CanManageResults]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ['admin', 'empresa']:
+            return Certification.objects.all()
+        return Certification.objects.filter(user=user)
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -70,9 +82,14 @@ class CertificationListCreateView(generics.ListCreateAPIView):
 
 
 class CertificationDetailView(generics.RetrieveUpdateDestroyAPIView):
-    """Ver, actualizar o eliminar una certificación"""
+    """
+    Ver, actualizar o eliminar una certificación.
+    - Admin/Empresa: Full access
+    - Aprendiz: Read only (their own certifications)
+    """
     queryset = Certification.objects.all()
     serializer_class = CertificationSerializer
+    permission_classes = [CanManageResults]
     
     @swagger_auto_schema(
         operation_description="Obtener detalles de una certificación específica",
@@ -109,7 +126,9 @@ class GenerateCertificationView(APIView):
     """
     Generar una certificación para un usuario basada en sus resultados.
     Endpoint: /certifications/{user_id}/generate/
+    - Only Admin and Empresa can generate certifications
     """
+    permission_classes = [IsAdminOrEmpresaOrReadOnly]
     
     @swagger_auto_schema(
         operation_description="""Genera una nueva certificación para el usuario basándose en:

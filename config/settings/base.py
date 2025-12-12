@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     'apps.certifications.apps.CertificationsConfig',
     'apps.users',
     'apps.organizations',
-    "skills",
-    'evidence',
+    'apps.skills',
+    'apps.evidence',
 ]
 
 MIDDLEWARE = [
@@ -117,6 +117,8 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
 }
 
 # JWT
@@ -124,6 +126,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
     'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # drf-spectacular
@@ -132,7 +136,6 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Plataforma para medir y evaluar habilidades reales',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    'SCHEMA_PATH_PREFIX': r'/api',
     'COMPONENT_SPLIT_REQUEST': True,
 }
 
@@ -152,22 +155,4 @@ LOGGING = {
             'level': 'INFO',
         },
     },
-}
-STATIC_URL = 'static/'
-
-SPECTACULAR_SETTINGS = {
-    'TITLE': 'TalentoX API',
-    'DESCRIPTION': 'API documentation for TalentoX',
-    'VERSION': '1.0.0',
-}
-# Django REST Framework
-REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-        'rest_framework.filters.SearchFilter',
-        'rest_framework.filters.OrderingFilter',
-    ],
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10,
 }

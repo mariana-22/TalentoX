@@ -13,3 +13,5 @@ drf-yasg
 django-filter
 mysql-connector-python
 mysqlclient
+python-decouple
+pillow
