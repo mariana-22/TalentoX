@@ -1,8 +1,20 @@
 """
 Script para poblar la base de datos con datos de ejemplo.
-Ejecutar con: python manage.py shell < scripts/populate_db.py
-O copiar y pegar en: python manage.py shell
+Ejecutar con: python scripts/populate_db.py
+O también con: python manage.py shell < scripts/populate_db.py
 """
+
+import os
+import sys
+
+# Agregar el directorio raíz del proyecto al path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Configurar Django
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings.dev')
+
+import django
+django.setup()
 
 from django.contrib.auth import get_user_model
 from apps.assessments.models import Assessment, Question, Option
