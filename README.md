@@ -17,24 +17,24 @@ El sistema está dividido en módulos (apps) para cada parte del proceso: `usuar
 
 ## 🏗️ Arquitectura
 ```bash
-skillbridge/
-├── config/
-│   └── settings/
-│       ├── base.py
-│       ├── dev.py
-│       └── prod.py
+TalentoX/                               # Proyecto principal
+├── config/                                # Configuración global de Django
+│   └── settings/                           # Ajustes separados por entorno
+│       ├── base.py                         # Configuración base (común a todo)
+│       ├── dev.py                          # Configuración para desarrollo
+│       └── prod.py                         # Configuración para producción
 │
-├── apps/
-│   ├── users/
-│   ├── organizations/
-│   ├── skills/
-│   ├── evidence/
-│   ├── assessments/
-│   ├── results/
-│   ├── certifications/
-│   └── recommendations/
+├── apps/                                   # Todas las aplicaciones del proyecto
+│   ├── users/                              # Gestión de usuarios, roles, perfiles y autenticación
+│   ├── organizations/                      # Empresas, equipos y relación con usuarios
+│   ├── skills/                             # Habilidades, categorías y niveles
+│   ├── evidence/                           # Evidencias, archivos y portafolios de usuarios
+│   ├── assessments/                        # Pruebas, retos y preguntas
+│   ├── results/                            # Resultados, puntajes y mejoras del usuario
+│   ├── certifications/                     # Certificaciones dinámicas basadas en desempeño
+│   └── recommendations/                    # Motor recomendador de nuevas habilidades / rutas
 │
-└── manage.py
+└── manage.py                               # Comando principal para ejecutar Django
 ```
 - settings/base.py → Configuración general (apps, DRF, JWT, middleware).
 - settings/dev.py → Configuración para desarrollo (debug, sqlite/mysql local).
@@ -48,6 +48,7 @@ Incluye:
 - `Token Access / Refresh`
 - `Vista /users/me/ para perfil propio`
 - `Permisos personalizados por rol`
+- 
 Roles principales:
 - `admin`
 - `empresa`
@@ -74,7 +75,19 @@ Uso estándar con django-filter:
 ```
 
 ## ❤️ Health Check
+Incluye endpoint:
+```bash
+/health/
+```
 
+```bash
+{
+  "status": "ok",
+  "database": "connected",
+  "version": "1.0.0"
+}
+
+```
 
 ## 🔄 Transacciones
 - Operaciones críticas usan transacciones atómicas:
@@ -114,7 +127,7 @@ Desde Swagger se pueden probar:
 
 ## 🧩 Módulos del Proyecto
 
-### 👤 ***Integrante 1*** – App **users** (Usuarios y Roles)
+## 👤 ***Integrante 1*** – App **users** (Usuarios y Roles)
 - **Funcionalidades**
 - Registro e inicio de sesión con JWT.
 - Perfiles de usuario.
@@ -144,4 +157,91 @@ Gestión de:
 
 - **Endpoints principales**
 `/organizations/{id}/members/`
-`/organizations/
+`/organizations/`
+
+## 🎯 ***Integrante 2*** – App **skills** (Habilidades, Categorías, Niveles)
+- **Gestiona**
+- Categorías
+- Habilidades
+- Niveles del usuario
+
+- **Modelos**
+- Category
+- Skill
+- SkillLevel ***(User + Skill + nivel dinámico)***
+
+- **Endpoints especiales**
+`/skills/{id}/top-users/`
+`/skills/{id}/levels/`
+
+### 📁 ***Integrante 2*** – App **evidence** (Evidencias / Portafolio)
+- **Permite subir:**
+- Fotos
+- Videos
+- Archivos
+- Links externos
+
+- **Modelos**
+- Evidence
+- MediaFile
+
+- **Endpoints**
+`/evidence/user/{id}/`
+`/evidence/skill/{id}/`
+
+## 📝 ***Integrante 3*** – App **assessments** (Pruebas y Retos)
+- **Gestiona:**
+- Pruebas
+- Preguntas
+- Opciones
+- Retos adaptativos
+
+- **Modelos**
+- Assessment
+- Question
+- Option
+
+- **Endpoints**
+`/assessments/{id}/start/`
+`/assessments/{id}/submit/` (transacción atómica)
+
+### 📊 ***Integrante 3*** – App **results** (Resultados y Puntajes)
+- **Procesa:**
+- Puntajes
+- Tiempos
+- Nivel ganado
+- Sugerencias de mejora
+
+- **Modelos**
+- Result
+- UserScore
+
+- **Endpoints**
+`/results/user/{id}/history/`
+`/results/user/{id}/improvements/`
+
+## 🎓 ***Integrante 4**** – App **certifications** (Certificaciones inteligentes)
+- **Genera certificaciones basadas en:**
+- Evidencias
+- Resultados
+- Habilidades del usuario
+
+- **Modelo**
+- Certification
+
+- **Endpoints**
+`/certifications/{user_id}/generate/`
+`/certifications/{user_id}/history/`
+
+### 🤖 ***Integrante 4*** – App **recommendations** (Motor de Recomendación)
+- **Genera:**
+- Nuevas habilidades recomendadas
+- Pruebas sugeridas
+- Rutas de aprendizaje personalizadas
+
+- **Modelos**
+- Recommendation
+
+- **Endpoints**
+`/recommendations/{user_id}/next-skills/`
+`/recommendations/{user_id}/learning-path/`
