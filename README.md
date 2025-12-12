@@ -15,28 +15,37 @@ Talentox permite:
 - Generar certificaciones inteligentes.
 - Consultar información desde Swagger o vía API.
 
-El sistema está dividido en módulos (apps) para cada parte del proceso: `usuarios`, `empresas`, `habilidades`, `evaluaciones`, `resultados`, `certificaciones` y `recomendaciones`.
+El sistema está dividido en módulos (apps) para cada parte del proceso: `usuarios`, `empresas`, `habilidades`, `evaluaciones`, `resultados` y `certificaciones`.
 
 ## 🏗️ Arquitectura
 ```bash
 TalentoX/                               # Proyecto principal
-├── config/                                # Configuración global de Django
-│   └── settings/                           # Ajustes separados por entorno
-│       ├── base.py                         # Configuración base (común a todo)
-│       ├── dev.py                          # Configuración para desarrollo
-│       └── prod.py                         # Configuración para producción
-│
-├── apps/                                   # Todas las aplicaciones del proyecto
-│   ├── users/                              # Gestión de usuarios, roles, perfiles y autenticación
-│   ├── organizations/                      # Empresas, equipos y relación con usuarios
-│   ├── skills/                             # Habilidades, categorías y niveles
-│   ├── evidence/                           # Evidencias, archivos y portafolios de usuarios
-│   ├── assessments/                        # Pruebas, retos y preguntas
-│   ├── results/                            # Resultados, puntajes y mejoras del usuario
-│   ├── certifications/                     # Certificaciones dinámicas basadas en desempeño
-│   └── recommendations/                    # Motor recomendador de nuevas habilidades / rutas
-│
-└── manage.py                               # Comando principal para ejecutar Django
+.
+├── apps
+│   ├── assessments
+│   ├── certifications
+│   ├── evidence
+│   ├── organizations
+│   ├── results
+│   ├── skills
+│   └── users
+├── config
+│   ├── settings
+│   │   ├── base.py
+│   │   ├── dev.py
+│   │   └── prod.py
+│   ├── asgi.py
+│   ├── __init__.py
+│   ├── urls.py
+│   └── wsgi.py
+├── docs
+│   └── API_GUIDE.md
+├── scripts
+│   └── populate_db.py
+├── build.sh
+├── manage.py
+├── README.md
+└── requirements.txt
 ```
 - settings/base.py → Configuración general (apps, DRF, JWT, middleware).
 - settings/dev.py → Configuración para desarrollo (debug, sqlite/mysql local).
@@ -115,9 +124,9 @@ python manage.py runserver
 ## 📘 Swagger + API Deploy
 Incluye documentación automática:
 ```bash
-/swagger/
-/api/schema/
-/redoc/
+/schema/
+/schema/swagger-ui/
+/schema/redoc/
 ```
 Desde Swagger se pueden probar:
 - login
@@ -129,7 +138,7 @@ Desde Swagger se pueden probar:
 
 ## 🧩 Módulos del Proyecto
 
-## 👤 ***Integrante 1*** – App **users** (Usuarios y Roles)
+## 👤 ***Integrante 1 (Angélica García)*** – App **users** (Usuarios y Roles)
 - **Funcionalidades**
 - Registro e inicio de sesión con JWT.
 - Perfiles de usuario.
@@ -144,7 +153,7 @@ Desde Swagger se pueden probar:
 `/users/me/`
 `/users/{id}/skills/`
 
-### 🏢 ***Integrante 1*** – App **organizations** (Empresas y Equipos)
+### 🏢 ***Integrante 1 (Angélica García)*** – App **organizations** (Empresas y Equipos)
 - **Funcionalidad**
 
 Gestión de:
@@ -161,7 +170,7 @@ Gestión de:
 `/organizations/{id}/members/`
 `/organizations/`
 
-## 🎯 ***Integrante 2*** – App **skills** (Habilidades, Categorías, Niveles)
+## 🎯 ***Integrante 2 (Sara Martínez)*** – App **skills** (Habilidades, Categorías, Niveles)
 - **Gestiona**
 - Categorías
 - Habilidades
@@ -176,7 +185,7 @@ Gestión de:
 `/skills/{id}/top-users/`
 `/skills/{id}/levels/`
 
-### 📁 ***Integrante 2*** – App **evidence** (Evidencias / Portafolio)
+### 📁 ***Integrante 2 (Sara Martínez)*** – App **evidence** (Evidencias / Portafolio)
 - **Permite subir:**
 - Fotos
 - Videos
@@ -191,7 +200,7 @@ Gestión de:
 `/evidence/user/{id}/`
 `/evidence/skill/{id}/`
 
-## 📝 ***Integrante 3*** – App **assessments** (Pruebas y Retos)
+## 📝 ***Integrante 3 (Mariana Valderrama)*** – App **assessments** (Pruebas y Retos)
 - **Gestiona:**
 - Pruebas
 - Preguntas
@@ -207,7 +216,7 @@ Gestión de:
 `/assessments/{id}/start/`
 `/assessments/{id}/submit/` (transacción atómica)
 
-### 📊 ***Integrante 3*** – App **results** (Resultados y Puntajes)
+### 📊 ***Integrante 3 (Mariana Valderrama)*** – App **results** (Resultados y Puntajes)
 - **Procesa:**
 - Puntajes
 - Tiempos
@@ -222,7 +231,7 @@ Gestión de:
 `/results/user/{id}/history/`
 `/results/user/{id}/improvements/`
 
-## 🎓 ***Integrante 4**** – App **certifications** (Certificaciones inteligentes)
+## 🎓 ***Integrante 4 (Jeonardo Perche)**** – App **certifications** (Certificaciones inteligentes)
 - **Genera certificaciones basadas en:**
 - Evidencias
 - Resultados
@@ -235,15 +244,3 @@ Gestión de:
 `/certifications/{user_id}/generate/`
 `/certifications/{user_id}/history/`
 
-### 🤖 ***Integrante 4*** – App **recommendations** (Motor de Recomendación)
-- **Genera:**
-- Nuevas habilidades recomendadas
-- Pruebas sugeridas
-- Rutas de aprendizaje personalizadas
-
-- **Modelos**
-- Recommendation
-
-- **Endpoints**
-`/recommendations/{user_id}/next-skills/`
-`/recommendations/{user_id}/learning-path/`
