@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
+from django.db import transaction
 
 from .models import Assessment, Question, Option
 from .serializers import (
@@ -400,48 +401,50 @@ class SubmitAssessmentView(APIView):
         serializer = SubmitAnswersSerializer(data=request.data)
         
         if serializer.is_valid():
-            question_id = serializer.validated_data.get("question_id")
-            option_id = serializer.validated_data.get("option_id")
-            
-            # Validar que la evaluación existe
-            try:
-                assessment = Assessment.objects.get(pk=pk)
-            except Assessment.DoesNotExist:
-                return Response(
-                    {"error": f"Evaluación con id {pk} no encontrada"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            # Validar que la pregunta existe y pertenece a la evaluación
-            try:
-                question = Question.objects.get(id=question_id, assessment=assessment)
-            except Question.DoesNotExist:
-                return Response(
-                    {"error": f"Pregunta con id {question_id} no encontrada en esta evaluación"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            # Validar que la opción existe y pertenece a la pregunta
-            try:
-                option = Option.objects.get(id=option_id, question=question)
-            except Option.DoesNotExist:
-                return Response(
-                    {"error": f"Opción con id {option_id} no encontrada para esta pregunta"},
-                    status=status.HTTP_404_NOT_FOUND
-                )
-            
-            # Verificar si la respuesta es correcta
-            is_correct = option.is_correct
-            
-            result = {
-                "message": "Respuesta recibida y procesada correctamente",
-                "assessment_id": pk,
-                "question_id": question_id,
-                "option_id": option_id,
-                "is_correct": is_correct,
-            }
-            
-            return Response(result, status=status.HTTP_200_OK)
+            # Atomic transaction to ensure data integrity
+            with transaction.atomic():
+                question_id = serializer.validated_data.get("question_id")
+                option_id = serializer.validated_data.get("option_id")
+                
+                # Validar que la evaluación existe
+                try:
+                    assessment = Assessment.objects.select_for_update().get(pk=pk)
+                except Assessment.DoesNotExist:
+                    return Response(
+                        {"error": f"Evaluación con id {pk} no encontrada"},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # Validar que la pregunta existe y pertenece a la evaluación
+                try:
+                    question = Question.objects.get(id=question_id, assessment=assessment)
+                except Question.DoesNotExist:
+                    return Response(
+                        {"error": f"Pregunta con id {question_id} no encontrada en esta evaluación"},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # Validar que la opción existe y pertenece a la pregunta
+                try:
+                    option = Option.objects.get(id=option_id, question=question)
+                except Option.DoesNotExist:
+                    return Response(
+                        {"error": f"Opción con id {option_id} no encontrada para esta pregunta"},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                # Verificar si la respuesta es correcta
+                is_correct = option.is_correct
+                
+                result = {
+                    "message": "Respuesta recibida y procesada correctamente",
+                    "assessment_id": pk,
+                    "question_id": question_id,
+                    "option_id": option_id,
+                    "is_correct": is_correct,
+                }
+                
+                return Response(result, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

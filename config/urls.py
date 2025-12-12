@@ -16,9 +16,30 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import JsonResponse
+from django.db import connection
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
+
+def health_check(request):
+    """Health check endpoint"""
+    try:
+        connection.ensure_connection()
+        db_status = "connected"
+    except Exception:
+        db_status = "disconnected"
+    
+    return JsonResponse({
+        "status": "ok",
+        "database": db_status,
+        "version": "1.0.0"
+    })
+
+
 urlpatterns = [
+    # Health Check
+    path('health/', health_check, name='health-check'),
+    
     # Admin
     path('admin/', admin.site.urls),
     
