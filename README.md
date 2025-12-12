@@ -107,7 +107,7 @@ El proyecto incluye pruebas para:
 
 Se ejecutan con:
 ```bash
-python manage.py test
+python manage.py runserver
 ```
 
 ## 📘 Swagger + API Deploy
